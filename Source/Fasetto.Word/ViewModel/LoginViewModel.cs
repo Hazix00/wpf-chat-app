@@ -32,6 +32,10 @@ namespace Fasetto.Word
         /// The command to login
         /// </summary>
         public ICommand LoginCommand { get; set; }
+        /// <summary>
+        /// The command to login
+        /// </summary>
+        public ICommand RegisterCommand { get; set; }
 
         #endregion
 
@@ -43,26 +47,36 @@ namespace Fasetto.Word
         public LoginViewModel()
         {
             // Create commands
-            LoginCommand = new RelayParameterizedCommand(async (parameter) => await Login(parameter));
+            LoginCommand = new RelayParameterizedCommand(async (parameter) => await LoginAsync(parameter));
+            RegisterCommand = new RelayCommand(async () => await RegisterAsync());
         }
 
-        #endregion
 
+        #endregion
         /// <summary>
-        /// Attempts to log the user in
+        /// Go to the Register page
         /// </summary>
-        /// <param name="parameter">The <see cref="SecureString"/> passed in from the view for the users password</param>
+        /// <param name="parameter"></param>
         /// <returns></returns>
-        public async Task Login(object parameter)
+        private async Task RegisterAsync()
         {
-            await RunCommand(() => this.LoginIsRunning, async () =>
+            ((Application.Current.MainWindow as MainWindow).DataContext as WindowViewModel).CurrentPage = ApplicationPage.Register;
+            await Task.Delay(0);
+        }
+        /// <summary>
+        /// Try to log in the user
+        /// </summary>
+        /// <returns></returns>
+        public async Task LoginAsync(object parameter)
+        {
+            await RunCommand(() => LoginIsRunning, async () =>
             {
                 await Task.Delay(5000);
 
-                var email = this.Email;
+                string email = Email;
 
-                // IMPORTANT: Never store unsecure password in variable like this
-                var pass = (parameter as IHavePassword).SecurePassword.Unsecure();
+                // !: Never store unsecure password in variable like this
+                string pass = (parameter as IHavePassword).SecurePassword.Unsecure();
             });
         }
     }
